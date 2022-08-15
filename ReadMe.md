@@ -37,6 +37,11 @@ You can use Gitpod for the one click online setup. With a single click it will l
 - configure database credentials with yours in ` .env` file
 - run `npm run start`.
 
+## Data seed
+- run `npm run seed:config` then `npm run seed:run`.
+- To drop all tables run `npm run schema:drop`.
+- To sync the database run `npm run schema:sync`.
+
 
 # API Validation
 
