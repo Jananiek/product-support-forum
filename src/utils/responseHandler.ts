@@ -15,6 +15,9 @@ export const ErrorResponseHandler = (res: Response, error: { message: string; na
   }
   if (error.name === ErrorTypes.CustomError) {
     return ErrorResponse(res, { message: error.message }, 400);
+  }
+  if (error.name === ErrorTypes.NoContent) {
+    return ErrorResponse(res, { message: error.message }, 204);
   } else {
     return ErrorResponse(res, { message: 'Internal server error' }, 500);
   }

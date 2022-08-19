@@ -5,6 +5,7 @@ import routes from '../api';
 import config from '../config';
 
 import { successHandler, errorHandler } from './logger/index';
+import  auth  from '../api/routes/auth';
 export default ({ app }: { app: express.Application }) => {
   /**
    * Health Check endpoints
@@ -39,6 +40,7 @@ export default ({ app }: { app: express.Application }) => {
   app.use(bodyParser.json({ limit: '2mb' }));
   // Load API routes
   app.use(config.api.prefix, routes());
+  app.use(auth);
 
   /// catch 404 and forward to error handler
   app.use((req, res, next) => {

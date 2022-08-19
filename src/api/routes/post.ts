@@ -9,7 +9,7 @@ import { PostInputDto } from '../../modules/post/dto/CreatePostInputDto';
 import { plainToInstance } from 'class-transformer';
 
 export default (app: Router): void => {
-  app.use('/posts', route);
+  app.use('/posts', verifyJWT,route);
 
   route.get('/', async (req: Request, res: Response) => {
     const { query } = req;

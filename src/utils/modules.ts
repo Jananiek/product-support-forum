@@ -1,5 +1,6 @@
 export default {
   health: 'health',
-  user:'user',
-  post:'post'
+  user: 'user',
+  auth: 'auth',
+  post: 'post',
 };
