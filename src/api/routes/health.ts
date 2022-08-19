@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import logger, { modules } from '../../loaders/logger/index';
 const route = Router();
-import { ErrorResponse } from '../../utils/responseHandler';
+import { ErrorResponse, SuccessResponse } from '../../utils/responseHandler';
 
 /**
  * Usage
@@ -18,6 +18,7 @@ export default (app: Router): void => {
   route.get('/', async (req: Request, res: Response) => {
     try {
       logger.info('Health works!', { module: modules.health, data: 'healthy' });
+      return SuccessResponse(res, 'Health works!', null, 200);
     } catch (error) {
       return ErrorResponse(res, { message: error.message }, 400);
     }
