@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import auth from './routes/auth';
 import health from './routes/health';
 import post from './routes/post';
 import swaggerDoc from './routes/swaggerDoc';
@@ -8,6 +9,7 @@ export default () => {
   const app = Router();
   swaggerDoc(app);
   health(app);
+  auth(app);
   user(app);
   post(app)
 

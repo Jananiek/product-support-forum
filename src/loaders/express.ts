@@ -5,7 +5,7 @@ import routes from '../api';
 import config from '../config';
 
 import { successHandler, errorHandler } from './logger/index';
-import  auth  from '../api/routes/auth';
+const cookieParser= require('cookie-parser')
 export default ({ app }: { app: express.Application }) => {
   /**
    * Health Check endpoints
@@ -36,11 +36,11 @@ export default ({ app }: { app: express.Application }) => {
   app.use(require('method-override')());
 
   app.use(express.json({ limit: '2mb' }));
+  app.use(cookieParser());
   // Middleware that transforms the raw string of req.body into json
   app.use(bodyParser.json({ limit: '2mb' }));
   // Load API routes
   app.use(config.api.prefix, routes());
-  app.use(auth);
 
   /// catch 404 and forward to error handler
   app.use((req, res, next) => {
@@ -59,6 +59,7 @@ export default ({ app }: { app: express.Application }) => {
     }
     return next(err);
   });
+
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.json({

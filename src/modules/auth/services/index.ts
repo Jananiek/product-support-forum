@@ -8,7 +8,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 const jwt = require('jsonwebtoken');
 
-
 export class AuthService {
   protected userRepo: UserRepository;
   constructor() {
@@ -24,6 +23,7 @@ export class AuthService {
     // encrypt the password & save user
     const hashedPassword = await bcrypt.hash(user.password, 10);
     user.password = hashedPassword;
+    user.roles = { User: 2031 };
     const { raw } = await this.userRepo.createUser(user);
     if (raw[0]) {
       return await this.userRepo.getOne(raw[0]['userName']);
@@ -39,14 +39,15 @@ export class AuthService {
     }
     // evaluate the password
     const match = await bcrypt.compare(user.password, foundUser.password);
+    const roles = Object.values(foundUser.roles);
     if (!match) {
       throw new CustomError('Password does not match');
     }
-    //TODO: Create JWT token to allow access to other routes
-    const accessToken = jwt.sign({ username: foundUser.userName }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: '30s',
+    // Create JWT token to allow access to other routes
+    const accessToken = jwt.sign({ userInfo: { email: foundUser.email, roles } }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: '300s',
     });
-    const refreshToken = jwt.sign({ username: foundUser.userName }, process.env.REFRESH_TOKEN_SECRET, {
+    const refreshToken = jwt.sign({ email: foundUser.email }, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: '1d',
     });
     //save refresh token
@@ -63,10 +64,11 @@ export class AuthService {
       throw new ForbiddenError('Forbidden');
     }
     // evaluate jwt
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-      if (err || foundUser.userName === decoded.username) throw new ForbiddenError('Forbidden');
-      const accessToken = jwt.sign({ username: decoded.username }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '30s',
+    return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+      if (err || foundUser.email !== decoded.email) throw new ForbiddenError('Forbidden');
+      const roles = Object.values(foundUser.roles);
+      const accessToken = jwt.sign({ userInfo: { email: decoded.email, roles } }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: '300s',
       });
       return accessToken;
     });
@@ -80,6 +82,5 @@ export class AuthService {
     }
     foundUser.refreshToken = '';
     await this.userRepo.updateUser(foundUser);
-   
   }
 }

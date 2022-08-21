@@ -13,7 +13,6 @@ const authService = new AuthService();
 
 export default (app: Router): void => {
   app.use('/auth', route);
-
   route.post('/register', async (req: Request, res: Response) => {
     const registerDto: UserRegisterDto = plainToInstance(UserRegisterDto, req.body, {
       enableImplicitConversion: false,
@@ -74,9 +73,9 @@ export default (app: Router): void => {
     if (!cookies?.jwt) ErrorResponseHandler(res, { message: 'No Content', name: 'NoContent' });
     const refreshToken = cookies.jwt;
     try {
-       await authService.logoutUser(refreshToken);
-        res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
-       return ErrorResponseHandler(res, { message: 'No Content', name: 'NoContent' });
+      await authService.logoutUser(refreshToken);
+      res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
+      return ErrorResponseHandler(res, { message: 'No Content', name: 'NoContent' });
     } catch (e) {
       logger.error('Logout User', {
         module: modules.auth,
@@ -87,9 +86,8 @@ export default (app: Router): void => {
     }
   });
 
-  route.post('/refresh', async (req: Request, res: Response) => {
+  route.get('/refresh', async (req: Request, res: Response) => {
     const cookies = req.cookies;
-
     if (!cookies?.jwt) return ErrorResponseHandler(res, { message: 'Unauthorized', name: 'UnauthorizedError' });
     const refreshToken = cookies.jwt;
 

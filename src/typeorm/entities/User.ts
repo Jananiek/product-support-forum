@@ -1,7 +1,9 @@
-
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, Unique, OneToMany } from 'typeorm';
 import { Post } from './Post';
-
+export enum ROLES_TYPES {
+  Admin = 2030,
+  User = 2031,
+}
 @Entity()
 @Unique('user_uk', ['email'])
 export class User {
@@ -23,8 +25,17 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: null})
+  @Column({ default: null })
   refreshToken: string;
+
+  @Column({
+    type: 'jsonb',
+    array: false,
+    default: () => "'[]'",
+    nullable: true,
+  })
+ // @Column()
+  public roles?: Record<string, number>;
 
   @OneToMany(() => Post, post => post.user, {
     cascade: true,

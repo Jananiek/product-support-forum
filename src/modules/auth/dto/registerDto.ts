@@ -28,4 +28,8 @@ export class RegisterDto {
   @Expose()
   @IsString()
   public lastName?: string;
+
+  @Expose()
+  @IsString()
+  public roles?: Record<string,number>;
 }
