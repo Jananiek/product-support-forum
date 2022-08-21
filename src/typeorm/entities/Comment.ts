@@ -1,4 +1,4 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn, Unique } from 'typeorm';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn, Unique, Index, ViewColumn } from 'typeorm';
 import { Post } from './Post';
 import { User } from './User';
 
@@ -11,7 +11,17 @@ export class Comment {
   @Column()
   comment: string;
 
-  @ManyToOne(() => Post, post => post.comments)
+  @Column()
+  @Index()
+  postId: number;
+
+  @Column()
+  @Index()
+  userId: number;
+
+  @ManyToOne(() => Post, post => post.comments, {
+    cascade: true,
+  })
   post: Post;
 
   @ManyToOne(() => User, user => user)
@@ -19,8 +29,8 @@ export class Comment {
   user: User;
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedAt?: Date;
 }

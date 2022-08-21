@@ -4,6 +4,7 @@ export enum ErrorTypes {
   UnauthorizedError = 'UnauthorizedError',
   ForbiddenError = 'ForbiddenError',
   InternalServerError = 'InternalServerError',
+  NoContent = 'NoContent',
   CustomError = 'CustomError',
 }
 export class NoDataFoundError extends AppError {
@@ -19,6 +20,12 @@ export class UnauthorizedError extends AppError {
 }
 
 export class ForbiddenError extends AppError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class NoContent extends AppError {
   constructor(message: string) {
     super(message);
   }
