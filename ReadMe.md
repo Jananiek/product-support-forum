@@ -43,22 +43,6 @@ You can use Gitpod for the one click online setup. With a single click it will l
 - To sync the database run `npm run schema:sync`.
 
 
-# API Validation
-
- By using [celebrate](https://github.com/arb/celebrate), the req.body schema becomes cleary defined at route level, so even frontend devs can read what an API endpoint expects without needing to write documentation that can get outdated quickly.
-
- ```js
- route.post('/signup',
-  celebrate({
-    body: Joi.object({
-      name: Joi.string().required(),
-      email: Joi.string().required(),
-      password: Joi.string().required(),
-    }),
-  }),
-  controller.signup)
- ```
-
  **Example error**
 
  ```json
@@ -71,7 +55,8 @@ You can use Gitpod for the one click online setup. With a single click it will l
 
 [Read more about celebrate here](https://github.com/arb/celebrate) and [the Joi validation API](https://github.com/hapijs/joi/blob/v15.0.1/API.md)
 
-# Roadmap
+# ED Diagram
+[Check here for ERD](https://drive.google.com/file/d/15JlbeHnqiLxJEirG9f2oQrf9pHAyCMyP/view?usp=sharing)
 
 
 
