@@ -6,13 +6,13 @@ import { removeNullOrUndefinedValues } from '../../../utils/helpers';
 import { IPagination } from '../../../interfaces/IPagination';
 import { IResponseListResult } from '../../../interfaces/IResponseListResult';
 import { Post } from '../../../typeorm/entities/Post';
-import { PostInputDto } from '../dto/CreatePostInputDto';
+import { PostInputDto } from '../dto/postInputDto';
 import { DeleteResult } from 'typeorm';
 import { UserRepository } from '../../users/repositories';
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-//import dotenv from 'dotenv';
-//dotenv.config()
+// import dotenv from 'dotenv';
+// dotenv.config()
 
 export class PostService {
   protected postRepo: PostRepository;
@@ -49,10 +49,14 @@ export class PostService {
       throw new Error(e.message);
     }
   }
+  public async getOneById(id: number): Promise<Post> {
+    return this.postRepo.getOneById(id);
+  }
   public async createOrUpdatePost(post: PostInputDto, userId: number): Promise<Post> {
     const existingPost = await this.postRepo.getOne(post.title);
     const user = await this.userRepo.getOneById(userId);
     const { comments = [], ...rest } = post;
+    //TODO in FE: isApprove :true only for admins
     if (!existingPost) {
       await this.postRepo.createOne({ ...rest, user });
     } else {
@@ -64,6 +68,18 @@ export class PostService {
       this.postRepo.upsertComments(comments);
     }
     return this.postRepo.getOne(post.title);
+  }
+
+  public async approvePost(title: string, userId: number): Promise<Post> {
+    const existingPost = await this.postRepo.getOne(title);
+    const user = await this.userRepo.getOneById(userId);
+    if (!existingPost) {
+      throw new CustomError('Post does not exists');
+    } else {
+      const updatedPost = { ...existingPost, isApproved: true, updatedAt: new Date(), user };
+      await this.postRepo.updateOne(updatedPost);
+    }
+    return this.postRepo.getOne(title);
   }
 
   public async deletePost(id: number): Promise<DeleteResult> {

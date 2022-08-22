@@ -13,7 +13,7 @@ const postService = new PostService();
 export default (app: Router): void => {
   app.use('/posts', route);
 
-  route.get('/', verifyJWT, verifyRoles(ROLES_LIST.User,ROLES_LIST.Admin), async (req: Request, res: Response) => {
+  route.get('/', verifyJWT, verifyRoles(ROLES_LIST.User, ROLES_LIST.Admin), async (req: Request, res: Response) => {
     const { query } = req;
     try {
       const posts = await postService.getAll(query);
@@ -28,12 +28,16 @@ export default (app: Router): void => {
     }
   });
   route.get('/:id', async (req: Request, res: Response) => {
-    const { query } = req;
+    const { params } = req;
+    const id = params.id ? Number(params.id) : undefined;
+    if(!id){
+       return ErrorResponse(res, { message: 'Missing post ID' });
+    }
     try {
-      const posts = await postService.getAll(query);
+      const posts = await postService.getOneById(id);
       return SuccessResponse(res, posts, null, 200);
     } catch (e) {
-      logger.error('Get all posts', {
+      logger.error('Get single post', {
         module: modules.post,
         service: 'posts',
         data: e.message,
@@ -41,7 +45,7 @@ export default (app: Router): void => {
       return ErrorResponseHandler(res, { message: e.message, name: e.name });
     }
   });
-  route.post('/', verifyRoles(ROLES_LIST.User,ROLES_LIST.Admin),async (req: Request, res: Response) => {
+  route.post('/', verifyRoles(ROLES_LIST.User, ROLES_LIST.Admin), async (req: Request, res: Response) => {
     try {
       const postDto: PostInputDto = plainToInstance(PostInputDto, req.body, {
         enableImplicitConversion: false,
@@ -76,6 +80,26 @@ export default (app: Router): void => {
       return SuccessResponse(res, posts, null, 200);
     } catch (e) {
       logger.error('Update post', {
+        module: modules.post,
+        service: 'posts',
+        data: e.message,
+      });
+      return ErrorResponseHandler(res, { message: e.message, name: e.name });
+    }
+  });
+  route.put('/approve', async (req: Request, res: Response) => {
+    const {
+      body: { title },
+    } = req;
+    const userId = 2;
+    if (!title) {
+      return ErrorResponse(res, { message: 'Missing post title' });
+    }
+    try {
+      const posts = await postService.approvePost(title, userId);
+      return SuccessResponse(res, posts, null, 200);
+    } catch (e) {
+      logger.error('Approve post', {
         module: modules.post,
         service: 'posts',
         data: e.message,

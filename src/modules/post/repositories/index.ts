@@ -2,7 +2,7 @@ import { DeleteResult, EntityManager, getConnection, getManager, getRepository, 
 import { IListResult } from '../../../interfaces/IListResult';
 import { Comment } from '../../../typeorm/entities/Comment';
 import { Post } from '../../../typeorm/entities/Post';
-import { PostInputDto } from '../dto/CreatePostInputDto';
+import { PostInputDto } from '../dto/postInputDto';
 import { PostFilterDto } from '../dto/postFilterDto';
 
 export class PostRepository {
@@ -10,7 +10,7 @@ export class PostRepository {
     return await getRepository(Post).findOne({ where: { title } });
   }
   public async getOneById(id: number): Promise<Post> {
-    return await getRepository(Post).findOne({ where: { id }, relations: ['comments'] });
+    return await getRepository(Post).findOne({ where: { id }, relations: ['comments','user'] });
   }
   public async getAll(filterOptions: PostFilterDto): Promise<any> {
     return await getRepository(Post).find({ where: { ...filterOptions } });
