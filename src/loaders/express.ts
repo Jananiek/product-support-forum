@@ -5,7 +5,10 @@ import routes from '../api';
 import config from '../config';
 
 import { successHandler, errorHandler } from './logger/index';
-const cookieParser= require('cookie-parser')
+
+import { corsOptions } from '../config/corsOptions';
+import { credentials } from '../middleware/credentials';
+const cookieParser = require('cookie-parser');
 export default ({ app }: { app: express.Application }) => {
   /**
    * Health Check endpoints
@@ -25,10 +28,13 @@ export default ({ app }: { app: express.Application }) => {
   // It shows the real origin IP in the heroku or Cloudwatch logs
   app.enable('trust proxy');
 
+  // Handle options credentials check - before CORS!
+  // and fetch cookies credentials requirement
+  app.use(credentials);
   // The magic package that prevents frontend developers going nuts
   // Alternate description:
   // Enable Cross Origin Resource Sharing to all origins by default
-  app.use(cors());
+  app.use(cors(corsOptions));
 
   // Some sauce that always add since 2014
   // "Lets you use HTTP verbs such as PUT or DELETE in places where the client doesn't support it."
