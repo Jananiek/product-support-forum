@@ -1,5 +1,7 @@
-import { getConnection, getRepository, InsertResult, UpdateResult } from 'typeorm';
+import { getConnection, getManager, getRepository, InsertResult, UpdateResult } from 'typeorm';
+import { IListResult } from '../../../interfaces/IListResult';
 import { User } from '../../../typeorm/entities/User';
+import { UserFilterDto } from '../dto/userFilterDto';
 import { UserRegisterDto } from '../dto/userRegisterDto';
 
 export class UserRepository {
@@ -11,7 +13,26 @@ export class UserRepository {
   }
 
   public async getOneByRefreshToken(token: string): Promise<User> {
-    return await getRepository(User).findOne({ where: { refreshToken:token } });
+    return await getRepository(User).findOne({ where: { refreshToken: token } });
+  }
+
+  async getUsersWithPagination(filterOptions: UserFilterDto): Promise<IListResult<User>> {
+    const { page, pageSize, ...restOptions } = filterOptions;
+    const [list, total] = await getManager()
+      .getRepository(User)
+      .findAndCount({
+        where: { ...restOptions },
+       // relations: ['posts'],
+        order: { updatedAt: 'DESC' },
+        take: pageSize,
+        skip: (page - 1) * pageSize,
+      });
+    return {
+      list,
+      total,
+      page,
+      pageSize,
+    };
   }
   public async createUser(user: UserRegisterDto): Promise<InsertResult> {
     try {
